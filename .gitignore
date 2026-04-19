@@ -47,6 +47,7 @@ backend/build/
 *.jar
 *.war
 .m2/
+.mvn/
 .gradle/
 .gradletasknamecache
 target/
