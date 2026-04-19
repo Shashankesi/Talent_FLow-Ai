@@ -19,14 +19,21 @@ javax.net.ssl.SSLException: Received fatal alert: internal_error
 
 ## Solution Approach 2: Update Connection String
 
-Add SSL parameters to your MongoDB connection string in `application.properties`:
+⚠️ **IMPORTANT**: Never hardcode MongoDB credentials in code. Use environment variables instead:
 
 ```properties
-# Option 1: Disable certificate verification (development only)
-spring.data.mongodb.uri=mongodb+srv://REDACTED@REDACTED_CLUSTER.mrrc1c2.mongodb.net/?appName=TalentFlowCluster&tls=true&tlsAllowInvalidCertificates=true
+# In application.properties (use environment variable)
+spring.data.mongodb.uri=${SPRING_DATA_MONGODB_URI}
 
-# Option 2: With SSL settings
-spring.data.mongodb.uri=mongodb+srv://REDACTED@REDACTED_CLUSTER.mrrc1c2.mongodb.net/?appName=TalentFlowCluster&ssl=true&rejectUnauthorized=false
+# Get the connection string from MongoDB Atlas:
+# MongoDB Atlas → Your Cluster → Connect → Connection String
+# Format: mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority&authSource=admin
+```
+
+**Example (do not hardcode)**:
+```bash
+# Set environment variable before running
+export SPRING_DATA_MONGODB_URI="mongodb+srv://username:password@your-cluster.mongodb.net/talentflow?retryWrites=true&w=majority&authSource=admin"
 ```
 
 ## Solution Approach 3: Use Local MongoDB (Recommended for Development)

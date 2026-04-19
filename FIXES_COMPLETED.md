@@ -22,13 +22,15 @@ All backend and frontend errors have been successfully fixed, dependencies have 
   - Added proper CORS configuration with `CorsConfigurationSource` bean
   - Added allowed origins: `http://localhost:3000` and `http://localhost:5173`
 
-### 3. **Updated MongoDB Connection String**
+### 3. **Secured MongoDB Connection String**
 - **File**: `backend/src/main/resources/application.properties`
-- **Update**: Changed from placeholder credentials to actual MongoDB Atlas connection:
-  ```
-  spring.data.mongodb.uri=mongodb+srv://REDACTED@REDACTED_CLUSTER.mrrc1c2.mongodb.net/?appName=TalentFlowCluster
+- **Update**: Changed from hardcoded credentials to environment variable:
+  ```properties
+  spring.data.mongodb.uri=${SPRING_DATA_MONGODB_URI}
   spring.data.mongodb.database=talentflow
   ```
+- **Setup**: Set `SPRING_DATA_MONGODB_URI` environment variable with your MongoDB Atlas connection string
+- **Security**: Credentials are never committed to git or exposed in code
 
 ### 4. **Fixed Maven Compiler Plugin Compatibility**
 - **File**: `backend/pom.xml`

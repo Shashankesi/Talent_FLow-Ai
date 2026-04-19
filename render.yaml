@@ -8,15 +8,18 @@ services:
     startCommand: "java -Dserver.port=$PORT -jar target/talentflow-api-*.jar"
     healthCheckPath: /api/health
     envVars:
-      - key: MONGODB_URI
+      # ⚠️ IMPORTANT: Set these in Render Dashboard (NOT in git)
+      - key: SPRING_DATA_MONGODB_URI
         scope: run
-        value: mongodb+srv://REDACTED@REDACTED_CLUSTER.mrrc1c2.mongodb.net/talentflow?retryWrites=true&w=majority&authSource=admin
+        # Get from MongoDB Atlas: mongodb+srv://user:pass@cluster/db
+      
       - key: JWT_SECRET
         scope: run
-        value: REDACTED_JWT_SECRET-production-minimum-32-characters-required-for-hs256
+        # Generate: openssl rand -base64 32
+      
       - key: CORS_ORIGINS
         scope: run
-        value: https://talentflow-frontend.onrender.com,http://localhost:3000,http://localhost:3001
+        # Set to: https://talentflow-frontend.onrender.com
 
   - type: static_site
     name: talentflow-frontend
@@ -31,4 +34,4 @@ services:
     envVars:
       - key: REACT_APP_API_BASE_URL
         scope: build
-        value: https://talentflow-backend.onrender.com/api
+        # Set to: https://talentflow-backend.onrender.com/api
