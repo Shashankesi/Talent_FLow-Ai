@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  @apply bg-white dark:bg-dark text-gray-900 dark:text-white transition-colors duration-300;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-dark-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-secondary;
+}
+
+/* Utility classes */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  @apply bg-white/10 backdrop-blur-md border border-white/20;
+}
+
+.dark .glass-effect {
+  @apply bg-dark-secondary/40 backdrop-blur-md border border-white/10;
+}
+
+.smooth-transition {
+  @apply transition-all duration-300 ease-out;
+}
+
+.shadow-lg-custom {
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.1);
+}
+
+.dark .shadow-lg-custom {
+  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.05);
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply px-6 py-2 rounded-lg font-semibold bg-primary text-white smooth-transition hover:bg-secondary active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-secondary {
+  @apply px-6 py-2 rounded-lg font-semibold border-2 border-primary text-primary smooth-transition hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Input styling */
+.input-field {
+  @apply w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-secondary text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 smooth-transition;
+}
+
+.input-field:disabled {
+  @apply bg-gray-100 dark:bg-dark cursor-not-allowed opacity-50;
+}
+
+.input-field::placeholder {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+/* Input focus improvement */
+.input-field:focus {
+  @apply border-primary shadow-md;
+}
+
+/* Card styling */
+.card {
+  @apply bg-white dark:bg-dark-secondary rounded-xl border border-gray-200 dark:border-gray-700 smooth-transition hover:shadow-lg;
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 1000px 100%;
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Toast notification styling */
+.toastContainer {
+  z-index: 9999;
+}
+
+/* Form validation states */
+.input-field.error {
+  @apply border-red-500 focus:ring-red-500/20;
+}
+
+.input-field.success {
+  @apply border-green-500 focus:ring-green-500/20;
+}
+
