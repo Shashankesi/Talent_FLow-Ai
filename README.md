@@ -44,7 +44,7 @@ TalentFlow-AI/
 └── README.md
 ⚙️ Setup Instructions
 🔹 1. Clone Repository
-git clone https://github.com/your-username/TalentFlow-AI.git
+git clone https://github.com/Shashankesi/TalentFlow-AI.git
 cd TalentFlow-AI
 🔹 2. Backend Setup (Spring Boot)
 cd backend
