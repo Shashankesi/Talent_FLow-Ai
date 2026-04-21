@@ -52,7 +52,8 @@ export default function PostJob({ isDark, onToggleDark }) {
       await recruiterService.createJob({
         ...formData,
         requiredSkills: skills,
-        salary: parseInt(formData.salary),
+        salary: parseInt(formData.salary, 10),
+        experienceRequired: parseInt(formData.experienceRequired, 10),
       });
       toast.success('Job posted successfully!');
       navigate('/recruiter/dashboard');

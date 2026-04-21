@@ -5,6 +5,7 @@ import com.talentflow.dto.JobDTO;
 import com.talentflow.entity.Job;
 import com.talentflow.repository.JobRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class JobService {
 
     private final JobRepository jobRepository;
@@ -38,14 +40,19 @@ public class JobService {
     }
 
     public JobDTO getJobById(String id) {
-        Job job = jobRepository.findById(id).orElseThrow(() -> new RuntimeException("Job not found"));
+        log.info("🔍 Getting job with ID: {}", id);
+        log.info("📊 Total jobs in DB: {}", jobRepository.count());
+        Job job = jobRepository.findById(id).orElseThrow(() -> new RuntimeException("Job not found with ID: " + id));
         return convertToDTO(job);
     }
 
     public List<JobDTO> getAllJobs() {
-        return jobRepository.findByIsClosed(false).stream()
+        log.info("📋 Fetching all jobs...");
+        List<JobDTO> jobs = jobRepository.findByIsClosed(false).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+        log.info("✅ Found {} active jobs", jobs.size());
+        return jobs;
     }
 
     public List<JobDTO> searchJobs(String keyword) {

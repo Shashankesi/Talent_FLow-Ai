@@ -15,7 +15,7 @@ export const useJobStore = create((set, get) => ({
     experience: '',
   },
 
-  setJobs: (jobs) => set({ jobs }),
+  setJobs: (jobs) => set({ jobs, filteredJobs: jobs }),
   setSelectedJob: (job) => set({ selectedJob: job }),
   setAppliedJobs: (jobs) => set({ appliedJobs: jobs }),
   setSavedJobs: (jobs) => set({ savedJobs: jobs }),

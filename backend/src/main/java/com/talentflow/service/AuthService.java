@@ -80,4 +80,12 @@ public class AuthService {
     public User getUserById(String id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    public void updateResumeReference(String userId, String resumeId) {
+        User user = getUserById(userId);
+        user.setResumeId(resumeId);
+        user.setUpdatedAt(LocalDateTime.now());
+        calculateProfileCompletion(user);
+        userRepository.save(user);
+    }
 }

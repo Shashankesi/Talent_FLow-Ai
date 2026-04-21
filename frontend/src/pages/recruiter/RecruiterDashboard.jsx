@@ -120,10 +120,10 @@ export default function RecruiterDashboard({ isDark, onToggleDark }) {
             <div className="space-y-4">
               {myJobs.map((job) => (
                 <motion.div
-                  key={job._id}
+                  key={job.id}
                   whileHover={{ x: 5 }}
                   className="card p-6 cursor-pointer"
-                  onClick={() => navigate(`/recruiter/applicants/${job._id}`)}
+                  onClick={() => navigate(`/recruiter/applicants/${job.id}`)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">

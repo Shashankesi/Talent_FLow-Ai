@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Job Portal with Recruitment Automation",
   "main": "index.js",
+  "type": "module",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",

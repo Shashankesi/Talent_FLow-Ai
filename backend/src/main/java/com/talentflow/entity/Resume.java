@@ -20,6 +20,7 @@ public class Resume {
     private String filename;
     private String fileUrl;
     private Long fileSize;
+    private byte[] fileData;
     
     // Extracted data
     private List<String> extractedSkills;

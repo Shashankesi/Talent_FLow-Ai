@@ -2,13 +2,13 @@ package com.talentflow.controller;
 
 import com.talentflow.dto.CreateJobRequest;
 import com.talentflow.dto.JobDTO;
-import com.talentflow.entity.Application;
 import com.talentflow.security.JwtTokenProvider;
 import com.talentflow.service.ApplicationService;
 import com.talentflow.service.AuthService;
 import com.talentflow.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +32,9 @@ public class RecruiterController {
             String token = authHeader.replace("Bearer ", "");
             String email = jwtTokenProvider.getEmailFromToken(token);
             var user = authService.findByEmail(email).orElseThrow();
+            if (!"RECRUITER".equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Only recruiters can post jobs"));
+            }
 
             JobDTO jobDTO = new JobDTO();
             var job = jobService.createJob(user.getId(), request, user.getCompanyName());
@@ -57,7 +60,11 @@ public class RecruiterController {
         try {
             String token = authHeader.replace("Bearer ", "");
             String email = jwtTokenProvider.getEmailFromToken(token);
-            String userId = authService.findByEmail(email).orElseThrow().getId();
+            var user = authService.findByEmail(email).orElseThrow();
+            if (!"RECRUITER".equals(user.getRole())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            String userId = user.getId();
             return ResponseEntity.ok(jobService.getJobsByRecruiter(userId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -65,14 +72,23 @@ public class RecruiterController {
     }
 
     @GetMapping("/jobs/{jobId}/applicants")
-    public ResponseEntity<List<Application>> getApplicants(
+    public ResponseEntity<?> getApplicants(
+            @RequestHeader("Authorization") String authHeader,
             @PathVariable String jobId) {
-        return ResponseEntity.ok(applicationService.getApplicationsByJob(jobId));
+        try {
+            validateRecruiter(authHeader);
+            return ResponseEntity.ok(applicationService.getApplicationsWithUserDetailsForJob(jobId));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PutMapping("/applications/{appId}/shortlist")
-    public ResponseEntity<?> shortlistCandidate(@PathVariable String appId) {
+    public ResponseEntity<?> shortlistCandidate(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String appId) {
         try {
+            validateRecruiter(authHeader);
             applicationService.shortlistCandidate(appId);
             return ResponseEntity.ok(Map.of("message", "Candidate shortlisted"));
         } catch (Exception e) {
@@ -81,8 +97,11 @@ public class RecruiterController {
     }
 
     @PutMapping("/applications/{appId}/select")
-    public ResponseEntity<?> selectCandidate(@PathVariable String appId) {
+    public ResponseEntity<?> selectCandidate(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String appId) {
         try {
+            validateRecruiter(authHeader);
             applicationService.selectCandidate(appId);
             return ResponseEntity.ok(Map.of("message", "Candidate selected"));
         } catch (Exception e) {
@@ -91,12 +110,24 @@ public class RecruiterController {
     }
 
     @PutMapping("/applications/{appId}/reject")
-    public ResponseEntity<?> rejectCandidate(@PathVariable String appId) {
+    public ResponseEntity<?> rejectCandidate(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable String appId) {
         try {
+            validateRecruiter(authHeader);
             applicationService.rejectCandidate(appId);
             return ResponseEntity.ok(Map.of("message", "Candidate rejected"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    private void validateRecruiter(String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        String email = jwtTokenProvider.getEmailFromToken(token);
+        var user = authService.findByEmail(email).orElseThrow();
+        if (!"RECRUITER".equals(user.getRole())) {
+            throw new RuntimeException("Only recruiters can perform this action");
         }
     }
 }

@@ -120,7 +120,7 @@ export default function MyApplications({ isDark, onToggleDark }) {
           >
             {filteredApps.map((app) => (
               <motion.div
-                key={app._id}
+                key={app.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 whileHover={{ x: 5 }}
@@ -135,10 +135,10 @@ export default function MyApplications({ isDark, onToggleDark }) {
                   {/* Job Info */}
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold mb-1">
-                      {app.jobId?.title || 'Job Title'}
+                      {app.job?.title || 'Job Title'}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 mb-2">
-                      {app.jobId?.companyName || 'Company Name'}
+                      {app.job?.companyName || 'Company Name'}
                     </p>
                     <p className="text-sm text-gray-500 dark:text-gray-500">
                       Applied on {formatDate(app.createdAt)}
@@ -198,7 +198,7 @@ export default function MyApplications({ isDark, onToggleDark }) {
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               No applications in this category yet
             </p>
-            <button className="btn-primary">Start Applying</button>
+            <button className="btn-primary" onClick={() => window.location.assign('/student/jobs')}>Start Applying</button>
           </motion.div>
         )}
       </main>

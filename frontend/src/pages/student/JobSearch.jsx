@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 export default function JobSearch({ isDark, onToggleDark }) {
   const navigate = useNavigate();
-  const { setJobs, jobs, filters, setFilters, filterJobs } = useJobStore();
+  const { setJobs, jobs, filteredJobs, filters, setFilters, filterJobs } = useJobStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +56,11 @@ export default function JobSearch({ isDark, onToggleDark }) {
     { name: 'DevOps', icon: '🔧' },
     { name: 'Mobile', icon: '📱' },
   ];
+
+  const jobsToRender =
+    filters.location || filters.experience || filters.minSalary > 0 || filters.maxSalary < 1000000
+      ? filteredJobs
+      : jobs;
 
   return (
     <div className={`min-h-screen ${isDark ? 'dark bg-dark' : 'bg-white'}`}>
@@ -191,15 +196,15 @@ export default function JobSearch({ isDark, onToggleDark }) {
                   <div key={i} className="card p-6 h-40 shimmer"></div>
                 ))}
               </div>
-            ) : jobs.length > 0 ? (
+            ) : jobsToRender.length > 0 ? (
               <div className="space-y-4">
-                {jobs.map((job) => (
+                {jobsToRender.map((job) => (
                   <motion.div
-                    key={job._id}
+                    key={job.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     whileHover={{ x: 5 }}
-                    onClick={() => navigate(`/student/job/${job._id}`)}
+                    onClick={() => navigate(`/student/job/${job.id}`)}
                     className="card p-6 cursor-pointer"
                   >
                     <div className="flex items-start justify-between">

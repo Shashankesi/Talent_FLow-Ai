@@ -1,11 +1,23 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
 
-// Determine API base URL based on environment
-const API_BASE_URL = import.meta.env.REACT_APP_API_BASE_URL || 
-  (import.meta.env.MODE === 'production' 
-    ? 'https://talentflow-backend.onrender.com/api'
-    : 'http://localhost:8081/api');
+const resolveApiBaseUrl = () => {
+  const configuredUrl =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.REACT_APP_API_BASE_URL;
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (import.meta.env.MODE === 'production') {
+    return 'https://talentflow-backend.onrender.com/api';
+  }
+
+  return 'http://localhost:8000/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,6 +38,16 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Auth APIs
 export const authService = {
   signup: (userData) => api.post('/auth/signup', userData),
@@ -42,6 +64,7 @@ export const jobService = {
   searchJobs: (keyword) => api.get(`/jobs/search?keyword=${keyword}`),
   filterJobs: (filters) => api.post('/jobs/filter', filters),
   getTrendingJobs: () => api.get('/jobs/trending'),
+  checkIfApplied: (jobId) => api.get(`/jobs/${jobId}/check-applied`),
 };
 
 // Application APIs
@@ -63,6 +86,8 @@ export const applicationService = {
   getApplicationById: (id) => api.get(`/applications/${id}`),
   updateApplicationStatus: (id, status) =>
     api.put(`/applications/${id}/status`, { status }),
+  getStudentStats: () => api.get('/applications/stats/student'),
+  getRecruiterJobStats: (jobId) => api.get(`/applications/stats/recruiter/job/${jobId}`),
 };
 
 // Recruiter APIs
@@ -91,6 +116,30 @@ export const resumeService = {
   },
   parseResume: (resumeId) => api.get(`/resumes/${resumeId}/parse`),
   getResume: (resumeId) => api.get(`/resumes/${resumeId}`),
+  getLatestResume: () => api.get('/resumes/user/latest'),
+  downloadResume: async (resumeId, filename = 'resume.pdf') => {
+    const response = await api.get(`/resumes/${resumeId}/download`, {
+      responseType: 'blob',
+    });
+    const blobUrl = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(blobUrl);
+  },
+};
+
+// Notification APIs
+export const notificationService = {
+  getNotifications: () => api.get('/notifications'),
+  getUnreadNotifications: () => api.get('/notifications/unread'),
+  getUnreadCount: () => api.get('/notifications/count'),
+  markAsRead: (notificationId) => api.put(`/notifications/${notificationId}/read`),
+  markAllAsRead: () => api.put('/notifications/read-all'),
+  deleteNotification: (notificationId) => api.delete(`/notifications/${notificationId}`),
 };
 
 export default api;

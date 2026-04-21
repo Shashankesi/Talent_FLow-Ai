@@ -21,6 +21,40 @@ export default function StudentProfile({ isDark, onToggleDark }) {
   const [resume, setResume] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  useEffect(() => {
+    setFormData({
+      fullName: user?.fullName || '',
+      email: user?.email || '',
+      phone: user?.phone || '',
+      skills: user?.skills || [],
+      education: user?.education || '',
+      experience: user?.experience || '',
+    });
+  }, [user]);
+
+  const loadProfile = async () => {
+    try {
+      const [profileResponse, resumeResponse] = await Promise.allSettled([
+        authService.getProfile(),
+        resumeService.getLatestResume(),
+      ]);
+
+      if (profileResponse.status === 'fulfilled') {
+        setUser(profileResponse.value.data.data);
+      }
+
+      if (resumeResponse.status === 'fulfilled') {
+        setResume(resumeResponse.value.data);
+      }
+    } catch (error) {
+      toast.error('Failed to load profile');
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -48,6 +82,7 @@ export default function StudentProfile({ isDark, onToggleDark }) {
       try {
         const response = await resumeService.uploadResume(file);
         setResume(response.data);
+        setUser({ ...user, resumeId: response.data.id });
         toast.success('Resume uploaded successfully!');
       } catch (error) {
         toast.error('Failed to upload resume');
@@ -59,7 +94,7 @@ export default function StudentProfile({ isDark, onToggleDark }) {
     setLoading(true);
     try {
       const response = await authService.updateProfile(formData);
-      setUser(response.data);
+      setUser(response.data.data);
       setIsEditing(false);
       toast.success('Profile updated successfully!');
     } catch (error) {
@@ -316,6 +351,17 @@ export default function StudentProfile({ isDark, onToggleDark }) {
                 className="hidden"
               />
             </label>
+            {resume?.id && (
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => resumeService.downloadResume(resume.id, resume.filename)}
+                  className="text-primary hover:underline font-medium"
+                >
+                  View uploaded resume
+                </button>
+              </div>
+            )}
           </div>
         </motion.div>
       </main>
